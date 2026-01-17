@@ -39,5 +39,29 @@ db.serialize(() => {
     )
   `)
 })
+const bcrypt = require("bcrypt")
 
+db.get(
+  "SELECT * FROM users WHERE role = 'admin'",
+  [],
+  (err, admin) => {
+    if (!admin) {
+      const hashedPassword = bcrypt.hashSync("Admin@123", 10)
+
+      db.run(
+        `
+        INSERT INTO users (name, email, password, address, role)
+        VALUES (?, ?, ?, ?, ?)
+        `,
+        [
+          "System Administrator Main Account",
+          "admin@roxiler.com",
+          hashedPassword,
+          "System Head Office Address",
+          "admin"
+        ]
+      )
+    }
+  }
+)
 module.exports = db
